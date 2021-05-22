@@ -1,0 +1,103 @@
+***********import master***************
+***Item***
+load csv with headers from "file:///Item.csv" as items 
+merge(n1:Item{ItemNo:items.ItemNo,Description:items.Description,uom:items.UOM,UnitCost:items.UnitCost,UnitPrice:items.UnitPrice})
+return  n1
+
+***ProductionBOM****
+load csv with headers from "file:///ProductionBOM.csv" as prodBOM 
+merge(n2:Production{ProductionBOMNo:prodBOM.ProductionBOM,Description:prodBOM.ProductionBOMDescripion ,UOM:prodBOM.UOM})
+return  n2
+
+****Vendor***
+load csv with headers from "file:///Vendor.csv" as Vendor
+merge(n3:Vendor{VendorNo:Vendor.VendorNo,Name:Vendor.Name})
+return  n3
+
+****Revenue***
+load csv with headers from "file:///Revenue.csv" as Rev
+merge(n4:Revenue{RevenueNo:Rev.Revenue,RevItemNo:Rev.ItemNo,RevAmount:Rev.RevenueAmount,Profit:Rev.Profit})
+return  n4
+
+****PurPrice******
+load csv with headers from "file:///PurPrice.csv" as PurchP
+merge(n5:PurchPrice{PurchPriceNo:PurchP.PurPrice,VendorP:PurchP.VendorPP,ItemP:PurchP.ItemPP})
+return  n5
+
+
+---------------------------------------------------------------------------------------------------------------
+import Relation
+MERGE (s)-[t:trade]->(c)
+
+*****Item->ProdBOM->BOMNo***** Itemนี้ใช้ BOM ไหน
+load csv with headers from "file:///Item_BOM.csv" as ItemBOM
+MERGE (source1:Item{ItemNo:ItemBOM.From})
+MERGE(target1:Production{ProductionBOMNo:ItemBOM.To})
+MERGE (source1)-[:PRODUCTIONBOM]->(target1)
+return source1,target1
+
+
+****BOM->HAVE->Item เก็บค่า QtyperUnit***********
+load csv with headers from "file:///ProductionBOM_HaveItem.csv" as ProdBOMItem
+MERGE (source2:Production{ProductionBOMNo:ProdBOMItem.From})
+MERGE(target2:Item {ItemNo:ProdBOMItem.To})
+MERGE (source2)-[:HAVE {QtyperUnit:ProdBOMItem.Qty}]->(target2)
+return source2,target2
+
+*******Item->HaveUnitCost>PurchPrice****
+load csv with headers from "file:///Item_PurchPrice.csv" as ItemPurchP
+MERGE(source3:Item{ItemNo:ItemPurchP.From})
+MERGE(target3:PurchPrice{PurchPriceNo:ItemPurchP.To})
+MERGE (source3)-[:HaveUnitCost {PurchPrice:ItemPurchP.PurchPrice}]->(target3)
+return source3,target3
+
+******Vendor->PurchPrice*******มีราคาอะไรบ้าง
+load csv with headers from "file:///Vendor_PurchPrice.csv" as VPurchP
+MERGE(source4:Vendor{VendorNo:VPurchP.FROM})
+MERGE(target4:PurchPrice{PurchPriceNo: VPurchP.To})
+MERGE (source4)-[:HavePrice]->(target4)
+return source4,target4
+
+******Find Top5*************
+merge (r:Revenue)
+return r.RevenueNo,r.RevItemNo, 
+round(apoc.convert.toFloat(r.RevAmount),2) as Revenue,
+round(apoc.convert.toFloat(r.Profit),2) as Profit, round(apoc.convert.toFloat(r.Profit)/apoc.convert.toFloat(r.RevAmount)*100,2) as ProfitRatio
+order by apoc.convert.toFloat(r.RevAmount) desc limit 5
+
+*****Find1******
+merge (r:Revenue)
+return r.RevenueNo,r.RevItemNo, 
+round(apoc.convert.toFloat(r.RevAmount),2) as Revenue,
+round(apoc.convert.toFloat(r.Profit),2) as Profit, round(apoc.convert.toFloat(r.Profit)/apoc.convert.toFloat(r.RevAmount)*100,2) as ProfitRatio
+order by 
+apoc.convert.toFloat(r.Profit)/apoc.convert.toFloat(r.RevAmount)*100,
+apoc.convert.toFloat(r.RevAmount) desc limit 1;
+
+****TopSalesProfirLoss*****
+MERGE(n5:LossProfit{Meaning:'TopSaleLossProfit',TItemNo:'.FG1010'})
+MERGE(i:Item{ItemNo:'FG1010'})
+MERGE (n5)-[:LossProfit]->(i)
+Return n5,i
+
+
+****ShowCost*****ปัจจุบัน มาเป็นกราฟ BOM
+merge (l:LossProfit{Meaning:'TopSaleLossProfit'})-[:LossProfit]->(i:Item)-[pb:PRODUCTIONBOM]->(p:Production)-[h:HAVE]->(b:Item)-[pb2:PRODUCTIONBOM]->(p2:Production)-[h2:HAVE]->(b2:Item)
+RETURN DISTINCT l,i,p,b,p2,b2
+
+****ShowCost*****ปัจจุบันแตกตาม วัตถุดิบ
+merge (l:LossProfit{Meaning:'TopSaleLossProfit'})-[:LossProfit]->(i:Item)-[pb:PRODUCTIONBOM]->(p:Production)-[h:HAVE]->(b)
+RETURN i.ItemNo,i.Description,p.ProductionBOMNo,b.ItemNo,h.QtyperUnit as QuantityPerUnit,b.UnitCost as UnitCost,
+(apoc.convert.toFloat(h.QtyperUnit)*apoc.convert.toFloat(b.UnitCost)) as CostAmount
+
+//Shotedpaht
+MATCH (c1:Item{ItemNo:'RM1001'})
+MATCH (c2:PurchPrice{ItemP:'RM1001'})
+CALL apoc.algo.dijkstra(c1,c2,'HaveUnitCost','PurchPrice') YIELD path,weight RETUEN c2.VenderP as VendorNo,apoc.convert.tofloat(weight) as MinimumPurchPrice
+ORDER by apoc.convert.tofloat(weight) limit 1
+
+
+
+
+
+
