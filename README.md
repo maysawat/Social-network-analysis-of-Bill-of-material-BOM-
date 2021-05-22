@@ -15,8 +15,10 @@ https://www.youtube.com/watch?v=M0l0i5p5lqU
 
 https://neo4j.com/download/
 
-### How to Import Data From CSV. Files,List of Relation,Query
+### How to Import Data From CSV. Files,Create Relation,Query data 
 
 Go To Wiki Tab
+
+https://github.com/maysawat/Social-network-analysis-of-Bill-of-material-BOM-/wiki/Social-network-analysis-of-Bill-of-material-(BOM)
 
 
