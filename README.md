@@ -15,24 +15,8 @@ https://www.youtube.com/watch?v=M0l0i5p5lqU
 
 https://neo4j.com/download/
 
-### Import Data From CSV. Files
-Master Data
+### How to Import Data From CSV. Files,List of Relation,Query
 
-1.Item 
-
-2.Vendor
-
-3.Production BOM
-
-4.Purchase Price
-
-5.Revenue By Item
-
-List of Relation
+Go To Wiki Tab
 
 
-
-
-
-
-### Query
