@@ -9,6 +9,7 @@ https://may-sawat.medium.com/social-network-analysis-of-bill-of-material-bom-b7b
 
 ### Video Presentation
 
+https://www.youtube.com/watch?v=M0l0i5p5lqU
 
 ### Setup and Install Neo4j Desktop
 
@@ -28,6 +29,8 @@ Master Data
 5.Revenue By Item
 
 List of Relation
+
+
 
 
 
