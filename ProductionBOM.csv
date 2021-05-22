@@ -1,0 +1,9 @@
+NodeType,ProductionBOM,ProductionBOMDescripion,UOM
+PRODUCTION,PBOM1000,Product Of Bicycle,PCS
+PRODUCTION,PBOM2000,Product Of Front Wheel,PCS
+PRODUCTION,PBOM3000,Product Of Front Hub,PCS
+PRODUCTION,PBOM4000,Product Of Back Wheel,PCS
+PRODUCTION,PBOM5000,Product Of Back  Hub,PCS
+PRODUCTION,PBOM6000,Product Of Chain assy,PCS
+PRODUCTION,PBOM7000,Product Of Brake,PCS
+PRODUCTION,PBOM8000,Product Of Bicycle 2,PCS
